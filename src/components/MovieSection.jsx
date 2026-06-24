@@ -16,7 +16,7 @@ const scrollBtnStyle = {
   justifyContent: 'center',
 };
 
-export default function MovieSection({ title, movies }) {
+export default function MovieSection({ title, movies, selectedMovie, setSelectedMovie }) {
   const scrollRef = useRef(null);
 
   const scrollLeft = () => {
@@ -57,7 +57,7 @@ export default function MovieSection({ title, movies }) {
       >
         {movies.length > 0 ? (
           movies.map((item) => (
-            <div key={item.id} style={{ minWidth: '200px', maxWidth: '200px' }}>
+            <div key={item.id} style={{ minWidth: '200px', maxWidth: '200px', cursor: "pointer"}} onClick={() => setSelectedMovie(item)}>
               <img 
                 src={item.image} 
                 alt={item.title} 

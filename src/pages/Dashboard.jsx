@@ -20,13 +20,13 @@ import Witcher from '../assets/witcher.jpg';
 export default function Dashboard() {
   // ----- MOVIE DATA (array of objects) -----
   const allMovies = [
-    { id: 1, title: 'Inception', type: 'movie', year: 2010, genre: 'Sci-Fi', image: Inception },
-    { id: 2, title: 'The Dark Knight', type: 'movie', year: 2008, genre: 'Action', image: DarkKnight },
-    { id: 3, title: 'Interstellar', type: 'movie', year: 2014, genre: 'Sci-Fi', image: Interstellar },
-    { id: 4, title: 'The Matrix', type: 'movie', year: 1999, genre: 'Action', image: Matrix },
-    { id: 5, title: 'Gladiator', type: 'movie', year: 2000, genre: 'Drama', image: Gladiator },
-    { id: 6, title: 'Avengers: Endgame', type: 'movie', year: 2019, genre: 'Action', image: Avengers },
-    { id: 7, title: 'The Wolf of Wall Street', type: 'movie', year: 2013, genre: 'Drama', image: Wall },
+    { id: 1, title: 'Inception', type: 'movie', year: 2010, genre: 'Sci-Fi', image: Inception, code: 27205},
+    { id: 2, title: 'The Dark Knight', type: 'movie', year: 2008, genre: 'Action', image: DarkKnight, code: 155},
+    { id: 3, title: 'Interstellar', type: 'movie', year: 2014, genre: 'Sci-Fi', image: Interstellar, code: 157336},
+    { id: 4, title: 'The Matrix', type: 'movie', year: 1999, genre: 'Action', image: Matrix, code: 603 },
+    { id: 5, title: 'Gladiator', type: 'movie', year: 2000, genre: 'Drama', image: Gladiator, code: 98},
+    { id: 6, title: 'Avengers: Endgame', type: 'movie', year: 2019, genre: 'Action', image: Avengers, code: 299534},
+    { id: 7, title: 'The Wolf of Wall Street', type: 'movie', year: 2013, genre: 'Drama', image: Wall, code: 106646},
     { id: 8, title: 'Stranger Things', type: 'series', year: 2016, genre: 'Sci-Fi', image: Stranger },
     { id: 9, title: 'The Crown', type: 'series', year: 2016, genre: 'Drama', image: Crown },
     { id: 10, title: 'Breaking Bad', type: 'series', year: 2008, genre: 'Drama', image: Bb },
@@ -39,6 +39,7 @@ export default function Dashboard() {
   // ----- STATES -----
   const [searchTerm, setSearchTerm] = useState('');
   const [movies, setMovies] = useState(allMovies);
+  const [selectedMovie, setSelectedMovie] = useState(null);
 
   // Filter movies based on search
   useEffect(() => {
@@ -74,9 +75,9 @@ export default function Dashboard() {
         </>
       ) : (
         <>
-          <Slideshow movies={slideshowMovies} />
-          <MovieSection title="Movies" movies={movieList} />
-          <MovieSection title="Series" movies={seriesList} />
+          <Slideshow movies={slideshowMovies} selectedMovie={selectedMovie} setSelectedMovie={setSelectedMovie} />
+          <MovieSection title="Movies" movies={movieList} selectedMovie={selectedMovie} setSelectedMovie={setSelectedMovie}/>
+          <MovieSection title="Series" movies={seriesList} selectedMovie={selectedMovie} setSelectedMovie={setSelectedMovie}/>
         </>
       )}
     </div>
