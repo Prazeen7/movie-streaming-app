@@ -3,7 +3,7 @@ import MovieSection from '../components/MovieSection';
 import Loader from '../components/Loader';
 import { getProgress } from '../utils/progressTracker';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = 'https://movie-streaming-app-skxm.onrender.com/api';
 
 export default function Movies() {
     const [movies, setMovies] = useState([]);
