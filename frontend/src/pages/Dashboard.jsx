@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Slideshow from '../components/Slideshow';
-import TvSection from '../components/TvSection';
 import MovieSection from '../components/MovieSection';
 import Loader from '../components/Loader';
+import ContinueWatching from '../components/ContinueWatching';
+import { getProgress } from '../utils/progressTracker';
 
-// Use environment variable for API URL
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export default function Dashboard() {
@@ -18,7 +18,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
 
-  // Fetch trending movies
   useEffect(() => {
     const fetchMovies = async () => {
       try {
@@ -34,7 +33,6 @@ export default function Dashboard() {
     fetchMovies();
   }, []);
 
-  // Fetch trending TV
   useEffect(() => {
     const fetchTv = async () => {
       try {
@@ -50,15 +48,7 @@ export default function Dashboard() {
     fetchTv();
   }, []);
 
-   useEffect(() => {
-    const checkLoading = () => {
-      if (movies.length >= 0 && tv.length >= 0) {
-        setTimeout(() => {
-          setInitialLoading(false);
-        }, 500);
-      }
-    };
-    
+  useEffect(() => {
     if (movies.length > 0 || tv.length > 0) {
       setTimeout(() => {
         setInitialLoading(false);
@@ -66,7 +56,6 @@ export default function Dashboard() {
     }
   }, [movies, tv]);
 
-  // Search functionality with debounce
   useEffect(() => {
     if (!searchTerm) {
       setFilteredMovie([]);
@@ -99,6 +88,120 @@ export default function Dashboard() {
 
   const slideshowMovies = movies.slice(0, 5);
 
+  const getTvShowProgress = (showId) => {
+    try {
+      const storedData = localStorage.getItem('watchProgress');
+      if (!storedData) return null;
+
+      const progressData = JSON.parse(storedData);
+      let bestProgress = null;
+      let highestProgress = 0;
+
+      Object.keys(progressData).forEach(key => {
+        if (key.startsWith(`tv_${showId}_`)) {
+          const progress = progressData[key];
+          if (progress.progress > highestProgress) {
+            highestProgress = progress.progress;
+            bestProgress = progress;
+          }
+        }
+      });
+
+      return bestProgress;
+    } catch (error) {
+      console.error('Error getting TV show progress:', error);
+      return null;
+    }
+  };
+
+  const getLastWatchedEpisode = (showId) => {
+    try {
+      const storedData = localStorage.getItem('watchProgress');
+      if (!storedData) return { season: 1, episode: 1 };
+
+      const progressData = JSON.parse(storedData);
+      let lastWatched = null;
+      let latestTimestamp = 0;
+
+      Object.keys(progressData).forEach(key => {
+        if (key.startsWith(`tv_${showId}_`)) {
+          const episode = progressData[key];
+          if (episode.lastUpdated > latestTimestamp) {
+            latestTimestamp = episode.lastUpdated;
+            lastWatched = episode;
+          }
+        }
+      });
+
+      if (lastWatched) {
+        return {
+          season: lastWatched.season || 1,
+          episode: lastWatched.episode || 1
+        };
+      }
+
+      return { season: 1, episode: 1 };
+    } catch (error) {
+      console.error('Error getting last watched episode:', error);
+      return { season: 1, episode: 1 };
+    }
+  };
+
+  const storeContentMetadata = (content, type) => {
+    try {
+      const storedData = localStorage.getItem('watchProgress');
+      if (!storedData) return;
+
+      const progressData = JSON.parse(storedData);
+
+      Object.keys(progressData).forEach(key => {
+        if (key.startsWith(`${type}_${content.id}`)) {
+          progressData[key] = {
+            ...progressData[key],
+            title: content.title || content.name || progressData[key].title,
+            name: content.name || content.title || progressData[key].name,
+            backdrop_path: content.backdrop_path || progressData[key].backdrop_path,
+            poster_path: content.poster_path || progressData[key].poster_path,
+            release_date: content.release_date || progressData[key].release_date,
+            first_air_date: content.first_air_date || progressData[key].first_air_date,
+            vote_average: content.vote_average || progressData[key].vote_average,
+            overview: content.overview || progressData[key].overview
+          };
+        }
+      });
+
+      localStorage.setItem('watchProgress', JSON.stringify(progressData));
+    } catch (error) {
+      console.error('Error storing metadata:', error);
+    }
+  };
+
+  const customGetProgress = (content, type) => {
+    if (type === 'tv') {
+      return getTvShowProgress(content.id);
+    } else {
+      return getProgress(content.id, 'movie');
+    }
+  };
+
+  const handleContentSelect = (content) => {
+    const isMovie = content.release_date !== undefined;
+    const type = isMovie ? 'movie' : 'tv';
+
+    storeContentMetadata(content, type);
+
+    if (isMovie) {
+      setSelectedMovie(content);
+    } else {
+      const lastWatched = getLastWatchedEpisode(content.id);
+      setSelectedMovie({
+        ...content,
+        season: lastWatched.season,
+        episode: lastWatched.episode
+      });
+    }
+  };
+
   if (initialLoading) {
     return <Loader fullScreen transparent={false} />;
   }
@@ -116,15 +219,19 @@ export default function Dashboard() {
               title="Movies"
               movies={filteredMovie}
               selectedMovie={selectedMovie}
-              setSelectedMovie={setSelectedMovie}
+              setSelectedMovie={handleContentSelect}
+              getProgress={customGetProgress}
+              contentType="movie"
             />
           )}
           {filteredTv.length > 0 && (
-            <TvSection
+            <MovieSection
               title="Series"
               movies={filteredTv}
               selectedMovie={selectedMovie}
-              setSelectedMovie={setSelectedMovie}
+              setSelectedMovie={handleContentSelect}
+              getProgress={customGetProgress}
+              contentType="tv"
             />
           )}
           {filteredMovie.length === 0 && filteredTv.length === 0 && !loading && (
@@ -138,24 +245,35 @@ export default function Dashboard() {
           <Slideshow
             movies={slideshowMovies}
             selectedMovie={selectedMovie}
-            setSelectedMovie={setSelectedMovie}
+            setSelectedMovie={handleContentSelect}
+            getProgress={customGetProgress}
           />
+          
+          <ContinueWatching
+            setSelectedMovie={handleContentSelect}
+            movies={movies}
+            tv={tv}
+          />
+
           <MovieSection
             title="Movies"
             movies={movies}
             selectedMovie={selectedMovie}
-            setSelectedMovie={setSelectedMovie}
+            setSelectedMovie={handleContentSelect}
+            getProgress={customGetProgress}
+            contentType="movie"
           />
-          <TvSection
+          <MovieSection
             title="Series"
             movies={tv}
             selectedMovie={selectedMovie}
-            setSelectedMovie={setSelectedMovie}
+            setSelectedMovie={handleContentSelect}
+            getProgress={customGetProgress}
+            contentType="tv"
           />
         </>
       )}
 
-      {/* Modal Player */}
       {selectedMovie && (
         <div
           style={{
@@ -221,10 +339,15 @@ export default function Dashboard() {
             </button>
             <iframe
               src={(() => {
-                const isMovie = selectedMovie.release_date;
-                return isMovie
-                  ? `https://www.vidking.net/embed/movie/${selectedMovie.id}?color=e50914&autoPlay=true`
-                  : `https://www.vidking.net/embed/tv/${selectedMovie.id}/1/1?color=e50914&autoPlay=true`;
+                const isMovie = selectedMovie.release_date !== undefined;
+
+                if (isMovie) {
+                  return `https://www.vidking.net/embed/movie/${selectedMovie.id}?color=e50914&autoPlay=true`;
+                } else {
+                  const season = selectedMovie.season || 1;
+                  const episode = selectedMovie.episode || 1;
+                  return `https://www.vidking.net/embed/tv/${selectedMovie.id}/${season}/${episode}?color=e50914&autoPlay=true&nextEpisode=true&episodeSelector=true`;
+                }
               })()}
               width="100%"
               height="100%"

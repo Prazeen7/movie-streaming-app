@@ -26,13 +26,11 @@ export default function Slideshow({ movies, selectedMovie, setSelectedMovie }) {
 
     // Get year from release_date
     const getYear = (date) => {
-        if (!date) return '2026';
         return date.split('-')[0] || '2026';
     };
 
     // Get rating or default
     const getRating = (vote) => {
-        if (!vote) return '9.4';
         return vote.toFixed(1);
     };
 
@@ -109,7 +107,7 @@ export default function Slideshow({ movies, selectedMovie, setSelectedMovie }) {
                                 textShadow: '0 2px 30px rgba(0,0,0,0.7)',
                                 lineHeight: '1.1',
                             }}>
-                                {movie.title.toUpperCase()}
+                                {movie.title?.toUpperCase() || movie.name?.toUpperCase()}
                             </h2>
 
                             {/* Rating & Meta */}
@@ -140,7 +138,7 @@ export default function Slideshow({ movies, selectedMovie, setSelectedMovie }) {
                                     fontSize: '0.7rem',
                                     fontWeight: '300',
                                 }}>
-                                    {getYear(movie.release_date)}
+                                    {getYear(movie.release_date || movie.first_air_date)}
                                 </span>
                                 <span style={{
                                     color: 'rgba(255,255,255,0.5)',
@@ -203,27 +201,6 @@ export default function Slideshow({ movies, selectedMovie, setSelectedMovie }) {
                                     }}
                                     onClick={() => setSelectedMovie(movie)}>
                                     ▶ Play
-                                </button>
-                                <button style={{
-                                    padding: '0.7rem 2rem',
-                                    background: 'transparent',
-                                    border: '1px solid rgba(255,255,255,0.3)',
-                                    borderRadius: '30px',
-                                    color: '#fff',
-                                    fontSize: '1rem',
-                                    fontWeight: '500',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.3s ease',
-                                }}
-                                    onMouseEnter={(e) => {
-                                        e.target.style.borderColor = '#fff';
-                                        e.target.style.background = 'rgba(255,255,255,0.05)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.target.style.borderColor = 'rgba(255,255,255,0.3)';
-                                        e.target.style.background = 'transparent';
-                                    }}>
-                                    See More
                                 </button>
                             </div>
                         </div>

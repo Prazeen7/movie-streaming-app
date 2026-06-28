@@ -50,6 +50,36 @@ app.get('/api/trending/tv', async (req, res) => {
     }
 });
 
+// Get content by ID (movie or TV)
+app.get('/api/content/:type/:id', async (req, res) => {
+    const { type, id } = req.params;
+    
+    // Validate type
+    if (type !== 'movie' && type !== 'tv') {
+        return res.status(400).json({ error: 'Invalid content type. Must be "movie" or "tv"' });
+    }
+    
+    try {
+        const response = await axios.get(`https://api.themoviedb.org/3/${type}/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${process.env.TMDB_API_TOKEN}`,
+                'accept': 'application/json'
+            },
+            params: {
+                language: 'en-US'
+            }
+        });
+        res.json(response.data);
+    } catch (error) {
+        console.error(`Error fetching ${type} ${id}:`, error.message);
+        if (error.response && error.response.status === 404) {
+            res.status(404).json({ error: 'Content not found' });
+        } else {
+            res.status(500).json({ error: `Failed to fetch ${type} details` });
+        }
+    }
+});
+
 app.get('/api/search', async (req, res) => {
     const { query } = req.query;
 
@@ -96,5 +126,5 @@ app.get('/api/search', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`🚀 Backend server running on http://localhost:${PORT}`);
+    console.log(` Backend server running on http://localhost:${PORT}`);
 });
