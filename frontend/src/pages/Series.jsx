@@ -2,19 +2,25 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import MovieSection from '../components/MovieSection';
 import Loader from '../components/Loader';
 import { getProgress } from '../utils/progressTracker';
+import { useOutletContext } from 'react-router-dom';
 
 const API_BASE_URL = 'https://movie-streaming-app-skxm.onrender.com/api';
 
 export default function Movies() {
     const [movies, setMovies] = useState([]);
-    const [selectedMovie, setSelectedMovie] = useState(null);
-    const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [totalPages, setTotalPages] = useState(0);
     const observerRef = useRef(null);
     const lastMovieRef = useRef(null);
+
+    const {
+        searchTerm,
+        setSearchTerm,
+        selectedMovie,
+        setSelectedMovie
+    } = useOutletContext();
 
     // Fetch movies with pagination
     const fetchMovies = useCallback(async (pageNum, append = false) => {

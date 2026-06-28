@@ -4,20 +4,26 @@ import MovieSection from '../components/MovieSection';
 import Loader from '../components/Loader';
 import ContinueWatching from '../components/ContinueWatching';
 import { getProgress } from '../utils/progressTracker';
+import { useOutletContext } from 'react-router-dom';
 
-const API_BASE_URL = "https://movie-streaming-app-skxm.onrender.com/api";
+const API_BASE_URL = 'https://movie-streaming-app-skxm.onrender.com/api';
 
 export default function Dashboard() {
-  const [searchTerm, setSearchTerm] = useState('');
   const [movies, setMovies] = useState([]);
   const [filteredMovie, setFilteredMovie] = useState([]);
   const [filteredTv, setFilteredTv] = useState([]);
   const [tv, setTv] = useState([]);
-  const [selectedMovie, setSelectedMovie] = useState(null);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [topRateMovie, setTopRateMovie] = useState([]);
   const [topRatedTv, setTopRatedTv] = useState([]);
+
+  const {
+    searchTerm,
+    setSearchTerm,
+    selectedMovie,
+    setSelectedMovie
+  } = useOutletContext();
 
   useEffect(() => {
     const fetchMovies = async () => {
