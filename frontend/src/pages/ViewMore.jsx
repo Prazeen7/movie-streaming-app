@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import MovieSection from '../components/MovieSection';
 import Loader from '../components/Loader';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'https://movie-streaming-app-skxm.onrender.com/api';
 
 const getGenreString = (genreIds) => {
     const genreMap = {
