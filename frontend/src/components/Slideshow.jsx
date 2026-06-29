@@ -39,7 +39,7 @@ export default function Slideshow({ movies, selectedMovie, setSelectedMovie }) {
             width: '100%', 
             position: 'relative',
             background: '#0f0f1a',
-            marginTop: '-70px',
+            marginTop: '-80px',
         }}>
             <div style={{
                 display: 'flex',

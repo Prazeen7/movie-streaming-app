@@ -1,13 +1,18 @@
 import React, { useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-export default function MovieSection({ 
-  title = 'Items', // Default title
-  movies = [], 
-  selectedMovie, 
-  setSelectedMovie, 
+export default function MovieSection({
+  title = '', // Default title
+  movies = [],
+  selectedMovie,
+  setSelectedMovie,
   getProgress,
   displayMode = 'horizontal'
 }) {
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const scrollRef = useRef(null);
 
   const scrollLeft = () => {
@@ -31,15 +36,17 @@ export default function MovieSection({
     const posterPath = item?.poster_path || '';
 
     return (
-      <div 
-        key={item?.id || Math.random()} 
+      <div
+        key={item?.id || Math.random()}
         style={{
           minWidth: isHorizontal ? '200px' : '200px',
           maxWidth: isHorizontal ? '200px' : '200px',
           cursor: "pointer",
           transition: 'transform 0.3s ease',
         }}
-        onClick={() => setSelectedMovie(item)}
+        onClick={() => navigate(`/movie-streaming-app/view-more/${item.id}`, {
+          state: {movie: item}
+        })}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'scale(1.05)';
         }}
@@ -76,10 +83,10 @@ export default function MovieSection({
             No Image
           </div>
         )}
-        <p style={{ 
-          marginTop: '0.5rem', 
-          fontWeight: 'bold', 
-          textAlign: 'center', 
+        <p style={{
+          marginTop: '0.5rem',
+          fontWeight: 'bold',
+          textAlign: 'center',
           color: '#fff',
           display: '-webkit-box',
           WebkitLineClamp: 2,
@@ -94,10 +101,10 @@ export default function MovieSection({
         }}>
           {displayTitle}
         </p>
-        <p style={{ 
-          fontSize: '0.8rem', 
-          opacity: 0.7, 
-          textAlign: 'center', 
+        <p style={{
+          fontSize: '0.8rem',
+          opacity: 0.7,
+          textAlign: 'center',
           color: '#ccc'
         }}>
           {displayDate}
@@ -109,29 +116,29 @@ export default function MovieSection({
   const hasMovies = movies && Array.isArray(movies) && movies.length > 0;
   const validMovies = hasMovies ? movies.filter(item => item && (item.id || item.title || item.name)) : [];
 
-  const displayTitle = title || 'Items';
+  const displayTitle = title;
 
   return (
     <div style={{ padding: '1rem 2rem', position: 'relative' }}>
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         marginBottom: '0.5rem'
       }}>
-        <h2 style={{ 
-          fontSize: '1.8rem', 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '0.5rem', 
+        <h2 style={{
+          fontSize: '1.8rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
           color: '#fff'
         }}>
           {displayTitle}
         </h2>
         {isHorizontal && validMovies.length > 0 && (
           <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button 
-              onClick={scrollLeft} 
+            <button
+              onClick={scrollLeft}
               style={{
                 backgroundColor: 'rgba(42, 42, 64, 0.8)',
                 border: '1px solid rgba(255,255,255,0.1)',
@@ -163,8 +170,8 @@ export default function MovieSection({
                 <polyline points="15 18 9 12 15 6"></polyline>
               </svg>
             </button>
-            <button 
-              onClick={scrollRight} 
+            <button
+              onClick={scrollRight}
               style={{
                 backgroundColor: 'rgba(42, 42, 64, 0.8)',
                 border: '1px solid rgba(255,255,255,0.1)',
@@ -199,7 +206,7 @@ export default function MovieSection({
           </div>
         )}
       </div>
-      
+
       {isHorizontal ? (
         <div
           ref={scrollRef}
@@ -235,7 +242,7 @@ export default function MovieSection({
           )}
         </div>
       )}
-      
+
       <style>{`
         .hide-scrollbar::-webkit-scrollbar {
           display: none;

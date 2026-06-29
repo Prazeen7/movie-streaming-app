@@ -156,6 +156,105 @@ app.get('/api/alltv', async (req, res) => {
     }
 });
 
+// ── Get cast for a movie or TV show ──
+app.get('/api/content/:type/:id/credits', async (req, res) => {
+    const { type, id } = req.params;
+    if (type !== 'movie' && type !== 'tv') {
+        return res.status(400).json({ error: 'Invalid type' });
+    }
+    try {
+        const response = await axios.get(`https://api.themoviedb.org/3/${type}/${id}/credits`, {
+            headers: {
+                'Authorization': `Bearer ${process.env.TMDB_API_TOKEN}`,
+                'accept': 'application/json'
+            },
+            params: { language: 'en-US' }
+        });
+        res.json(response.data);
+    } catch (error) {
+        console.error(`Error fetching credits for ${type} ${id}:`, error.message);
+        res.status(500).json({ error: 'Failed to fetch credits' });
+    }
+});
+
+// ── Get recommendations for a movie or TV show ──
+app.get('/api/content/:type/:id/recommendations', async (req, res) => {
+    const { type, id } = req.params;
+    if (type !== 'movie' && type !== 'tv') {
+        return res.status(400).json({ error: 'Invalid type' });
+    }
+    try {
+        const response = await axios.get(`https://api.themoviedb.org/3/${type}/${id}/recommendations`, {
+            headers: {
+                'Authorization': `Bearer ${process.env.TMDB_API_TOKEN}`,
+                'accept': 'application/json'
+            },
+            params: { language: 'en-US', page: 1 }
+        });
+        res.json(response.data);
+    } catch (error) {
+        console.error(`Error fetching recommendations for ${type} ${id}:`, error.message);
+        res.status(500).json({ error: 'Failed to fetch recommendations' });
+    }
+});
+
+// ── Get full TV details (includes seasons) ──
+app.get('/api/content/tv/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const response = await axios.get(`https://api.themoviedb.org/3/tv/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${process.env.TMDB_API_TOKEN}`,
+                'accept': 'application/json'
+            },
+            params: { language: 'en-US' }
+        });
+        res.json(response.data);
+    } catch (error) {
+        console.error(`Error fetching TV ${id}:`, error.message);
+        res.status(500).json({ error: 'Failed to fetch TV details' });
+    }
+});
+
+// ── Get season details (episodes) ──
+app.get('/api/content/tv/:id/season/:seasonNumber', async (req, res) => {
+    const { id, seasonNumber } = req.params;
+    try {
+        const response = await axios.get(`https://api.themoviedb.org/3/tv/${id}/season/${seasonNumber}`, {
+            headers: {
+                'Authorization': `Bearer ${process.env.TMDB_API_TOKEN}`,
+                'accept': 'application/json'
+            },
+            params: { language: 'en-US' }
+        });
+        res.json(response.data);
+    } catch (error) {
+        console.error(`Error fetching season ${seasonNumber} for TV ${id}:`, error.message);
+        res.status(500).json({ error: 'Failed to fetch season details' });
+    }
+});
+
+// Get videos (trailers) for a movie or TV show
+app.get('/api/content/:type/:id/videos', async (req, res) => {
+    const { type, id } = req.params;
+    if (type !== 'movie' && type !== 'tv') {
+        return res.status(400).json({ error: 'Invalid type' });
+    }
+    try {
+        const response = await axios.get(`https://api.themoviedb.org/3/${type}/${id}/videos`, {
+            headers: {
+                'Authorization': `Bearer ${process.env.TMDB_API_TOKEN}`,
+                'accept': 'application/json'
+            },
+            params: { language: 'en-US' }
+        });
+        res.json(response.data);
+    } catch (error) {
+        console.error(`Error fetching videos for ${type} ${id}:`, error.message);
+        res.status(500).json({ error: 'Failed to fetch videos' });
+    }
+});
+
 app.get('/api/search', async (req, res) => {
     const { query } = req.query;
 

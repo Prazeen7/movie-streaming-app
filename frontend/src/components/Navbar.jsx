@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import Logo from '../assets/logo.png';
 
 export default function Navbar({ searchTerm, setSearchTerm, selectedMovie, setSelectedMovie, getProgress }) {
   const navigate = useNavigate();
@@ -27,20 +28,18 @@ export default function Navbar({ searchTerm, setSearchTerm, selectedMovie, setSe
     <>
       <style>
         {`
-          /* Base styles for nav (already in inline styles) – overrides only where needed */
           .navbar-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1rem 2rem;
-            background-color: transparent;
-            border-bottom: none;
-            flex-wrap: wrap;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            gap: 1rem;
-          }
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      background-color: transparent;
+      border-bottom: none;
+      flex-wrap: wrap;
+      gap: 1rem;
+      position: relative;
+      z-index: 10;
+    }
 
           .nav-left {
             display: flex;
@@ -189,9 +188,16 @@ export default function Navbar({ searchTerm, setSearchTerm, selectedMovie, setSe
 
       <nav className="navbar-container">
         <div className="nav-left">
-          <span className="nav-logo" onClick={handleHomeClick}>
-            MovieDash
-          </span>
+          <img
+            className="nav-logo"
+            src={Logo}
+            alt="Logo"
+            onClick={handleHomeClick}
+            style={{
+              width: '50px',
+              height: 'auto'
+            }}
+          />
         </div>
 
         <div className="nav-right">
